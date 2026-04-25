@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "../deps/quickjs/quickjs.h"
+#include "bindings/console.h"
 
 static char *read_file(const char *path, size_t *out_len) {
     FILE *f = fopen(path, "rb");
@@ -32,6 +33,8 @@ int main(int argc, char *argv[]) {
 
     JSRuntime *rt = JS_NewRuntime();
     JSContext *ctx = JS_NewContext(rt);
+
+    mari_console_init(ctx);
 
     JSValue result = JS_Eval(ctx, src, src_len, argv[1], JS_EVAL_TYPE_GLOBAL);
     free(src);
