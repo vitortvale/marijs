@@ -4,6 +4,7 @@
 #include "bindings/console.h"
 #include "bindings/timers.h"
 #include "bindings/fs.h"
+#include "bindings/process.h"
 #include "loop/loop.h"
 #include "loop/timers.h"
 #include "loader/module.h"
@@ -49,6 +50,7 @@ int main(int argc, char *argv[]) {
     mari_console_init(ctx);
     mari_timers_binding_init(ctx);
     mari_fs_binding_init(ctx);
+    mari_process_binding_init(ctx);
 
     int eval_flags = mari_is_module(argv[1], src)
                      ? JS_EVAL_TYPE_MODULE : JS_EVAL_TYPE_GLOBAL;
