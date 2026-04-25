@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "../deps/quickjs/quickjs.h"
 #include "bindings/console.h"
+#include "loop/loop.h"
 
 static char *read_file(const char *path, size_t *out_len) {
     FILE *f = fopen(path, "rb");
@@ -34,6 +35,9 @@ int main(int argc, char *argv[]) {
     JSRuntime *rt = JS_NewRuntime();
     JSContext *ctx = JS_NewContext(rt);
 
+    MariLoop loop;
+    mari_loop_init(&loop);
+
     mari_console_init(ctx);
 
     JSValue result = JS_Eval(ctx, src, src_len, argv[1], JS_EVAL_TYPE_GLOBAL);
@@ -47,9 +51,12 @@ int main(int argc, char *argv[]) {
         JS_FreeCString(ctx, msg);
         JS_FreeValue(ctx, exc);
         exit_code = 1;
+    } else {
+        mari_loop_run(&loop, rt);
     }
 
     JS_FreeValue(ctx, result);
+    mari_loop_free(&loop);
     JS_FreeContext(ctx);
     JS_FreeRuntime(rt);
     return exit_code;
