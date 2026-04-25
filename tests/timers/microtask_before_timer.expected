@@ -1,0 +1,4 @@
+microtask before timers
+timer 1
+microtask after timer 1
+timer 2
