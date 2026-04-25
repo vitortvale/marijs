@@ -5,6 +5,7 @@
 #include "bindings/timers.h"
 #include "loop/loop.h"
 #include "loop/timers.h"
+#include "loader/module.h"
 
 static char *read_file(const char *path, size_t *out_len) {
     FILE *f = fopen(path, "rb");
@@ -35,6 +36,7 @@ int main(int argc, char *argv[]) {
     }
 
     JSRuntime *rt = JS_NewRuntime();
+    mari_module_loader_init(rt);
     JSContext *ctx = JS_NewContext(rt);
 
     MariLoop loop;
@@ -46,7 +48,9 @@ int main(int argc, char *argv[]) {
     mari_console_init(ctx);
     mari_timers_binding_init(ctx);
 
-    JSValue result = JS_Eval(ctx, src, src_len, argv[1], JS_EVAL_TYPE_GLOBAL);
+    int eval_flags = mari_is_module(argv[1], src)
+                     ? JS_EVAL_TYPE_MODULE : JS_EVAL_TYPE_GLOBAL;
+    JSValue result = JS_Eval(ctx, src, src_len, argv[1], eval_flags);
     free(src);
 
     int exit_code = 0;
