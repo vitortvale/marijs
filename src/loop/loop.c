@@ -39,6 +39,15 @@ static void drain_jobs(JSRuntime *rt) {
     }
 }
 
+void mari_loop_add_fd(MariLoop *loop, int fd, uint32_t events, MariIOHandle *handle) {
+    struct epoll_event ev = { .events = events, .data.ptr = handle };
+    epoll_ctl(loop->epoll_fd, EPOLL_CTL_ADD, fd, &ev);
+}
+
+void mari_loop_remove_fd(MariLoop *loop, int fd) {
+    epoll_ctl(loop->epoll_fd, EPOLL_CTL_DEL, fd, NULL);
+}
+
 void mari_loop_run(MariLoop *loop, JSRuntime *rt) {
     struct epoll_event events[EPOLL_MAX_EVENTS];
 
@@ -52,6 +61,11 @@ void mari_loop_run(MariLoop *loop, JSRuntime *rt) {
         if (n < 0)
             break;
 
-        /* I/O dispatch will be added here as handles are introduced */
+        for (int i = 0; i < n; i++) {
+            MariIOHandle *h = events[i].data.ptr;
+            h->dispatch(h, loop);
+        }
+
+        drain_jobs(rt);
     }
 }
