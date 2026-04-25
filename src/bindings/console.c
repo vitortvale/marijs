@@ -34,6 +34,28 @@ static JSValue js_console_error(JSContext *ctx, JSValueConst this_val,
     return JS_UNDEFINED;
 }
 
+static JSValue js_queue_microtask(JSContext *ctx, JSValueConst this_val,
+                                   int argc, JSValueConst *argv) {
+    (void)this_val;
+    if (argc < 1 || !JS_IsFunction(ctx, argv[0]))
+        return JS_UNDEFINED;
+
+    JSValue global   = JS_GetGlobalObject(ctx);
+    JSValue Promise  = JS_GetPropertyStr(ctx, global, "Promise");
+    JSValue resolve  = JS_GetPropertyStr(ctx, Promise, "resolve");
+    JSValue resolved = JS_Call(ctx, resolve, Promise, 0, NULL);
+    JSValue then     = JS_GetPropertyStr(ctx, resolved, "then");
+    JSValue result   = JS_Call(ctx, then, resolved, 1, &argv[0]);
+
+    JS_FreeValue(ctx, result);
+    JS_FreeValue(ctx, then);
+    JS_FreeValue(ctx, resolved);
+    JS_FreeValue(ctx, resolve);
+    JS_FreeValue(ctx, Promise);
+    JS_FreeValue(ctx, global);
+    return JS_UNDEFINED;
+}
+
 void mari_console_init(JSContext *ctx) {
     JSValue global = JS_GetGlobalObject(ctx);
     JSValue console = JS_NewObject(ctx);
@@ -46,5 +68,7 @@ void mari_console_init(JSContext *ctx) {
         JS_NewCFunction(ctx, js_console_error, "error", 1));
 
     JS_SetPropertyStr(ctx, global, "console", console);
+    JS_SetPropertyStr(ctx, global, "queueMicrotask",
+        JS_NewCFunction(ctx, js_queue_microtask, "queueMicrotask", 1));
     JS_FreeValue(ctx, global);
 }

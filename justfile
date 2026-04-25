@@ -5,8 +5,11 @@ src     := "src/main.c src/bindings/console.c src/bindings/timers.c src/loop/loo
 cflags  := "-Wall -Wextra -I deps/quickjs -D_GNU_SOURCE -DCONFIG_VERSION='\"" + version + "\"'"
 ldflags := "-lm -ldl -lpthread"
 
-dev:
+dev: install
+
+install:
     gcc {{cflags}} {{qjs_src}} {{src}} -o mari {{ldflags}}
+    cp mari ~/.local/bin/mari
 
 clean:
     rm -f mari
