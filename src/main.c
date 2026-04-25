@@ -2,7 +2,9 @@
 #include <stdlib.h>
 #include "../deps/quickjs/quickjs.h"
 #include "bindings/console.h"
+#include "bindings/timers.h"
 #include "loop/loop.h"
+#include "loop/timers.h"
 
 static char *read_file(const char *path, size_t *out_len) {
     FILE *f = fopen(path, "rb");
@@ -37,8 +39,12 @@ int main(int argc, char *argv[]) {
 
     MariLoop loop;
     mari_loop_init(&loop);
+    mari_timers_init();
+
+    JS_SetContextOpaque(ctx, &loop);
 
     mari_console_init(ctx);
+    mari_timers_binding_init(ctx);
 
     JSValue result = JS_Eval(ctx, src, src_len, argv[1], JS_EVAL_TYPE_GLOBAL);
     free(src);
