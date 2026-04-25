@@ -59,6 +59,8 @@ int main(int argc, char *argv[]) {
         exit_code = 1;
     } else {
         mari_loop_run(&loop, rt);
+        if (loop.had_error)
+            exit_code = 1;
     }
 
     JS_FreeValue(ctx, result);

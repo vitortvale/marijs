@@ -7,6 +7,7 @@
 typedef struct MariLoop {
     int epoll_fd;
     int alive;
+    int had_error;
 } MariLoop;
 
 typedef struct MariIOHandle {

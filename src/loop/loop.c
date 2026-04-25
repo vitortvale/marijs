@@ -8,6 +8,7 @@
 void mari_loop_init(MariLoop *loop) {
     loop->epoll_fd = epoll_create1(EPOLL_CLOEXEC);
     loop->alive = 0;
+    loop->had_error = 0;
 }
 
 void mari_loop_free(MariLoop *loop) {
@@ -25,7 +26,7 @@ void mari_loop_dec_alive(MariLoop *loop) {
     loop->alive--;
 }
 
-static void drain_jobs(JSRuntime *rt) {
+static void drain_jobs(JSRuntime *rt, MariLoop *loop) {
     JSContext *ctx;
     int ret;
     while ((ret = JS_ExecutePendingJob(rt, &ctx)) > 0)
@@ -36,6 +37,7 @@ static void drain_jobs(JSRuntime *rt) {
         fprintf(stderr, "Uncaught exception in microtask: %s\n", msg);
         JS_FreeCString(ctx, msg);
         JS_FreeValue(ctx, exc);
+        loop->had_error = 1;
     }
 }
 
@@ -52,7 +54,7 @@ void mari_loop_run(MariLoop *loop, JSRuntime *rt) {
     struct epoll_event events[EPOLL_MAX_EVENTS];
 
     for (;;) {
-        drain_jobs(rt);
+        drain_jobs(rt, loop);
 
         if (loop->alive <= 0)
             break;
@@ -66,6 +68,6 @@ void mari_loop_run(MariLoop *loop, JSRuntime *rt) {
             h->dispatch(h, loop);
         }
 
-        drain_jobs(rt);
+        drain_jobs(rt, loop);
     }
 }

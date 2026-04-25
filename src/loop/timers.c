@@ -41,6 +41,7 @@ static void timer_dispatch(MariIOHandle *handle, MariLoop *loop) {
         fprintf(stderr, "Uncaught exception in timer: %s\n", msg);
         JS_FreeCString(t->ctx, msg);
         JS_FreeValue(t->ctx, exc);
+        loop->had_error = 1;
     }
     JS_FreeValue(t->ctx, ret);
 
