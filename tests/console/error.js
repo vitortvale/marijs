@@ -1,0 +1,1 @@
+console.error("fatal error");
