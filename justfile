@@ -1,7 +1,7 @@
 version := `cat deps/quickjs/VERSION`
 
 qjs_src := "deps/quickjs/quickjs.c deps/quickjs/libregexp.c deps/quickjs/libunicode.c deps/quickjs/cutils.c deps/quickjs/dtoa.c"
-src     := "src/main.c src/bindings/console.c src/bindings/timers.c src/bindings/fs.c src/bindings/process.c src/loop/loop.c src/loop/timers.c src/loop/fs.c src/loop/child.c src/loader/module.c"
+src     := "src/main.c src/bindings/console.c src/bindings/timers.c src/bindings/fs.c src/bindings/process.c src/bindings/net.c src/loop/loop.c src/loop/timers.c src/loop/fs.c src/loop/child.c src/loop/tcp.c src/loader/module.c"
 cflags  := "-Wall -Wextra -I deps/quickjs -D_GNU_SOURCE -DCONFIG_VERSION='\"" + version + "\"'"
 ldflags := "-lm -ldl -lpthread"
 

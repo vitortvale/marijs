@@ -5,6 +5,7 @@
 #include "bindings/timers.h"
 #include "bindings/fs.h"
 #include "bindings/process.h"
+#include "bindings/net.h"
 #include "loop/loop.h"
 #include "loop/timers.h"
 #include "loader/module.h"
@@ -51,6 +52,7 @@ int main(int argc, char *argv[]) {
     mari_timers_binding_init(ctx);
     mari_fs_binding_init(ctx);
     mari_process_binding_init(ctx);
+    mari_net_binding_init(rt, ctx);
 
     int eval_flags = mari_is_module(argv[1], src)
                      ? JS_EVAL_TYPE_MODULE : JS_EVAL_TYPE_GLOBAL;
@@ -74,6 +76,7 @@ int main(int argc, char *argv[]) {
     JS_FreeValue(ctx, result);
     mari_loop_free(&loop);
     JS_FreeContext(ctx);
+    JS_RunGC(rt);
     JS_FreeRuntime(rt);
     return exit_code;
 }
